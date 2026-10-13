@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var step = Math.max(1, Math.ceil(target / 30));
         var t = setInterval(function () {
             n = Math.min(target, n + step);
-            el.textContent = n + (n === target && target >= 10 ? '+' : '');
+            el.textContent = n + (n === target && el.hasAttribute('data-plus') ? '+' : '');
             if (n === target) clearInterval(t);
         }, 40);
     }
@@ -64,18 +64,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }, { threshold: 0.12 });
     document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
 
-    // ─── Portfólio: imagens, filtros e lightbox ───────────────────────────
+    // ─── Portfólio: filtros ───────────────────────────────────────────────
     var works = document.querySelectorAll('.work');
-    works.forEach(function (w) {
-        var media = w.querySelector('.work-media');
-        var src = w.getAttribute('data-img');
-        var probe = new Image();
-        probe.onload = function () { media.style.backgroundImage = 'url("' + src + '")'; w.dataset.loaded = '1'; };
-        probe.onerror = function () { media.innerHTML = '<i class="fa-solid fa-hands-asl-interpreting" aria-hidden="true"></i>'; };
-        probe.src = src;
-        w.setAttribute('tabindex', '0');
-    });
-
     document.querySelectorAll('.filter').forEach(function (btn) {
         btn.addEventListener('click', function () {
             var f = btn.getAttribute('data-filter');
@@ -89,22 +79,41 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // ─── Lightbox com os 18 slides do portfólio (1.jpg … 18.jpg) ──
+    var TOTAL = 18, current = 1;
     var lb = document.getElementById('lightbox');
     var lbImg = lb.querySelector('img');
     var lbCap = lb.querySelector('.lightbox-caption');
-    function openWork(w) {
-        if (!w.dataset.loaded) return;
-        lbImg.src = w.getAttribute('data-img');
-        lbImg.alt = w.querySelector('figcaption').textContent;
-        lbCap.textContent = lbImg.alt;
+    function show(n) {
+        current = ((n - 1 + TOTAL) % TOTAL) + 1;
+        lbImg.src = '' + current + '.jpg';
+        lbImg.alt = 'Slide ' + current + ' do portfólio';
+        lbCap.textContent = current + ' / ' + TOTAL;
         lb.hidden = false;
+        new Image().src = '' + (current % TOTAL + 1) + '.jpg';
     }
-    works.forEach(function (w) {
-        w.addEventListener('click', function () { openWork(w); });
-        w.addEventListener('keydown', function (e) { if (e.key === 'Enter') openWork(w); });
+    document.querySelectorAll('[data-slide]').forEach(function (el) {
+        var n = parseInt(el.getAttribute('data-slide'), 10);
+        el.addEventListener('click', function () { show(n); });
+        el.addEventListener('keydown', function (e) { if (e.key === 'Enter') show(n); });
     });
-    lb.addEventListener('click', function (e) { if (e.target !== lbImg) lb.hidden = true; });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') lb.hidden = true; });
+    document.getElementById('open-deck').addEventListener('click', function () { show(1); });
+    lb.querySelector('.lb-prev').addEventListener('click', function (e) { e.stopPropagation(); show(current - 1); });
+    lb.querySelector('.lb-next').addEventListener('click', function (e) { e.stopPropagation(); show(current + 1); });
+    lb.addEventListener('click', function (e) { if (e.target === lb || e.target.closest('.lightbox-close')) lb.hidden = true; });
+    document.addEventListener('keydown', function (e) {
+        if (lb.hidden) return;
+        if (e.key === 'Escape') lb.hidden = true;
+        if (e.key === 'ArrowRight') show(current + 1);
+        if (e.key === 'ArrowLeft') show(current - 1);
+    });
+
+    document.querySelectorAll('[data-goto-filter]').forEach(function (a) {
+        a.addEventListener('click', function () {
+            var b = document.querySelector('.filter[data-filter="' + a.getAttribute('data-goto-filter') + '"]');
+            if (b) b.click();
+        });
+    });
 
     document.getElementById('year').textContent = new Date().getFullYear();
 });
