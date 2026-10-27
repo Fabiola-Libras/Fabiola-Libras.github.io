@@ -195,3 +195,7 @@ footer { text-align: center; padding: 32px 20px 90px; color: var(--muted); font-
     .traduarte { grid-template-columns: 1fr; padding: 32px 20px !important; margin: 16px; }
     .traduarte-list { grid-template-columns: 1fr; }
 }
+
+/* Anos na linha do tempo e detalhes na galeria */
+.timeline h3 small { font-family: 'Inter', sans-serif; font-size: .78rem; font-weight: 600; color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); padding: 2px 10px; border-radius: 999px; margin-left: 8px; white-space: nowrap; vertical-align: middle; }
+.work figcaption small { display: block; margin-top: 6px; font-weight: 400; font-size: .8rem; color: var(--muted); line-height: 1.5; }

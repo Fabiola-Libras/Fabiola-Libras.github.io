@@ -79,18 +79,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ─── Lightbox com os 18 slides do portfólio (1.jpg … 18.jpg) ──
-    var TOTAL = 18, current = 1;
+    // ─── Lightbox com os 19 slides do portfólio (19.jpeg … 37.jpeg) ──
+    // Slide n do PDF = arquivo (n + 18).jpeg
+    var OFFSET = 18;
+    var TOTAL = 19, current = 1;
     var lb = document.getElementById('lightbox');
     var lbImg = lb.querySelector('img');
     var lbCap = lb.querySelector('.lightbox-caption');
     function show(n) {
         current = ((n - 1 + TOTAL) % TOTAL) + 1;
-        lbImg.src = '' + current + '.jpg';
+        lbImg.src = (current + OFFSET) + '.jpeg';
         lbImg.alt = 'Slide ' + current + ' do portfólio';
         lbCap.textContent = current + ' / ' + TOTAL;
         lb.hidden = false;
-        new Image().src = '' + (current % TOTAL + 1) + '.jpg';
+        new Image().src = ((current % TOTAL + 1) + OFFSET) + '.jpeg';
     }
     document.querySelectorAll('[data-slide]').forEach(function (el) {
         var n = parseInt(el.getAttribute('data-slide'), 10);
